@@ -1,7 +1,7 @@
 {
   "model_name": "mri_xception_selective_finetuning",
   "version": "1.0.0",
-  "task": "Brain MRI Multi-Class Tumor Classification",
+  "task": "Brain MRI Four-Class Image Classification",
   "modality": "Brain MRI (Axial/Coronal/Sagittal T1/T2-weighted)",
   "backbone": "Xception",
   "pretrained_weights": "ImageNet",
@@ -15,7 +15,6 @@
     "notumor",
     "pituitary"
   ],
-  "confidence_threshold": 0.85,
   "checkpoint_file": "mri_xception_selective_finetuning_best.keras",
   "training_summary": {
     "train_samples": 4480,
@@ -37,14 +36,7 @@
       "notumor": 0.9709,
       "pituitary": 0.9802
     },
-    "clinical_triage": {
-      "total_pathology_tumors": 1200,
-      "total_normal_healthy": 400,
-      "tumor_sensitivity_recall": 0.9800,
-      "healthy_specificity": 1.0000,
-      "critical_false_negatives": 24,
-      "false_positives": 0
-    }
+    "note": "Test metrics are model-evaluation metrics, not clinical performance claims."
   },
   "created_at": "2026-09-30",
   "framework": "TensorFlow / Keras 3"

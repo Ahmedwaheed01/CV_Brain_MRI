@@ -1,201 +1,88 @@
-# ClinIQ — Brain MRI Tumor Classification System 🧠
+# ClinIQ Computer Vision
 
-[![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
-[![TensorFlow](https://img.shields.io/badge/TensorFlow-2.16%2B-orange.svg)](https://tensorflow.org/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-1.30%2B-FF4B4B.svg)](https://streamlit.io/)
-[![Status](https://img.shields.io/badge/Modality-Brain%20MRI%20(Validated)-brightgreen.svg)]()
-[![License](https://img.shields.io/badge/License-MIT-green.svg)]()
+Computer Vision component of an AI-based online-clinic graduation project.
 
-> **ClinIQ Computer Vision Subsystem**: An end-to-end, clinically safe deep learning pipeline for multi-class Brain MRI tumor classification and pathology triage. Developed as the Computer Vision core for the ClinIQ AI-Powered Healthcare Marketplace graduation project.
+The currently implemented component is **Brain MRI image classification**. Future work may add independent Bone Fracture X-ray and Skin Injury models; neither is implemented in this repository yet.
 
----
+> This is a research and educational prototype. It classifies images and returns model confidence. It is not a medical diagnostic system and does not provide treatment, triage, or clinical advice.
 
-## 📌 Executive Summary & Key Results
+## Current MRI model
 
-| Metric | Result | Clinical Significance |
-| :--- | :---: | :--- |
-| **Held-Out Test Accuracy** | **92.81%** | Evaluated on 1,600 strictly untouched test scans (400 per class) |
-| **Macro Average F1-Score** | **0.9263** | Balanced performance across both common and rare tumor morphologies |
-| **Tumor Sensitivity (Recall)** | **98.00%** | **1,176 / 1,200** pathological scans detected (only 2.0% false negatives) |
-| **Normal Specificity** | **100.00%** | **400 / 400** healthy brains correctly verified (**0 false alarms**) |
-| **Inference Safety Threshold** | **0.85** | Flagging ambiguous predictions ($<85\%$) for mandatory specialist review |
+The MRI model predicts one dataset class:
 
----
+- `glioma`
+- `meningioma`
+- `notumor`
+- `pituitary`
 
-## 🎯 Supported Pathology Classes
-
-The model classifies axial, coronal, and sagittal brain MRI scans across four distinct categories:
-
-1. **`glioma`**: Intra-axial neuroepithelial tumors originating from glial tissue.
-2. **`meningioma`**: Extra-axial tumors arising from the arachnoid layer of the meninges.
-3. **`pituitary`**: Sellar and parasellar tumors of the pituitary gland.
-4. **`notumor`**: Healthy brain anatomy exhibiting intact symmetry and absence of mass lesions.
-
----
-
-## 📂 Project Repository Structure
+It is an Xception model pretrained on ImageNet and selectively fine-tuned at the top of the backbone. Its image flow is:
 
 ```text
-CV feature/
-├── app.py                                   # Interactive Streamlit Web Demonstration
-├── requirements.txt                         # Pinned production & research dependencies
-├── .gitignore                               # Git rules preventing 100MB+ file push errors
-├── README.md                                # Comprehensive project documentation
-│
-├── models/                                  # Packaged artifacts & metadata
-│   ├── class_names.json                     # Index-to-label class mapping
-│   ├── preprocess_config.json               # Input resolution and normalization config
-│   ├── mri_model_metadata.json              # Versioning, hyperparameters & test metrics
-│   └── mri_xception_selective_finetuning_best.keras # Checkpoint file (downloaded from Kaggle)
-│
-├── notebooks/                               # Reproducible Phase-by-Phase Research Notebooks
-│   ├── 01_mri_dataset_verification.ipynb    # Phase 1 & 1.5: Image integrity & duplicate audit
-│   ├── 02_mri_preprocessing.ipynb           # Phase 2: Stratified train/val split & padding
-│   ├── 03_mri_training.ipynb                # Phase 3: Frozen Xception baseline (92.14% val)
-│   ├── 04_mri_fine_tuning.ipynb             # Phase 4: Selective fine-tuning (95.80% val)
-│   └── 05_mri_final_evaluation.ipynb        # Phase 5: Held-out test evaluation (92.81% test)
-│
-├── results/                                 # Evaluation figures & scientific reports
-│   ├── figures/                             # Training curves, confusion matrices, triage plots
-│   └── metrics/                             # CSV history logs and text evaluation reports
-│
-├── src/                                     # Production-Grade Modular Codebase
-│   ├── preprocessing/
-│   │   ├── __init__.py
-│   │   └── mri_preprocessing.py             # Aspect-ratio padding & Xception scaler
-│   └── inference/
-│       ├── __init__.py
-│       ├── __main__.py                      # Package CLI runner
-│       └── mri_predictor.py                 # MRIPredictor OOP class & predict_mri API
-│
-└── tests/
-    └── test_mri_inference.py                # 16 unit & integration tests (100% passing)
+Uploaded image
+  -> RGB conversion
+  -> aspect-ratio-preserving resize + black padding (Lanczos)
+  -> 299 x 299
+  -> Xception normalization [-1, 1]
+  -> Xception + 4-class softmax
+  -> predicted class + model confidence
 ```
 
----
+Model confidence is the selected softmax output. It is not a clinical probability.
 
-## 🚀 Quick Start Guide
+## Evaluation results
 
-### 1. Environment Setup
+- Validation accuracy: **95.80%** on the Phase 2 validation split.
+- Final untouched test accuracy: **92.81%** on the original 1,600-image Testing split.
 
-Clone the repository and install required packages:
+The original dataset’s train/test folders show substantial perceptual and structural similarity. Patient-level leakage cannot be confirmed because patient identifiers are unavailable. Additionally, known exact duplicate groups cross the standard train/validation split, so validation performance may be optimistic. See `results/metrics/` for the experiment reports.
+
+## Repository layout
+
+```text
+app/streamlit_app.py             Streamlit MRI demonstration
+src/preprocessing/               Reusable RGB/padding/Xception preprocessing
+src/inference/                   Reusable model-loading and prediction API
+models/*.json                    Lightweight class, preprocessing, and model metadata
+tests/                           Preprocessing and inference tests
+results/                         Reproducible training/evaluation artifacts
+```
+
+## Run locally
+
+Create a virtual environment, install dependencies, and place the trained model weights locally. The repository deliberately excludes large model binaries and raw medical images.
 
 ```bash
-git clone https://github.com/<your-username>/cliniq-brain-mri.git
-cd cliniq-brain-mri
-
-# Create and activate virtual environment (optional but recommended)
-python -m venv .venv
-# Windows:
-.venv\Scripts\activate
-# Linux/macOS:
-source .venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
+python -m streamlit run app/streamlit_app.py
 ```
 
-### 2. Launch the Interactive Streamlit Web UI
+The app looks for the checkpoint named in `models/mri_model_metadata.json` under `models/`, or for a path in the `CLINIQ_MRI_MODEL_PATH` environment variable. No model-hosting URL is assumed or provided.
 
-Run the user-friendly web interface:
+If weights are unavailable, the app shows a clear error and never fabricates a prediction.
 
-```bash
-streamlit run app.py
-```
-
-The web application opens automatically in your browser at `http://localhost:8501`, featuring:
-- **Instant Scan Upload**: Upload any JPG/PNG brain MRI scan.
-- **Benchmark Sample Selector**: Test immediately using pre-loaded glioma, meningioma, pituitary, and normal scans with a single click.
-- **Aspect-Ratio Padded Inspection**: Visualizes original vs. preprocessed $299 \times 299$ padded views.
-- **Safety Thresholding**: Live slider to simulate clinical review flags.
-- **Multi-Class Probability Distribution**: Interactive charts displaying confidence across all conditions.
-
----
-
-### 3. Python API & Standalone Inference
-
-Use the modular inference pipeline in your own scripts or backend services:
+## Python inference
 
 ```python
 from src.inference.mri_predictor import predict_mri
 
-# Run inference on any image path, byte stream, or PIL Image
-result = predict_mri("data/raw/mri/Testing/glioma/Te-gl_1.jpg")
-
+result = predict_mri("path/to/mri_image.jpg")
 print(result)
 ```
 
-**Standardized Output Schema**:
-```json
-{
-  "success": true,
-  "prediction": "glioma",
-  "class_index": 0,
-  "confidence": 0.9412,
-  "low_confidence": false,
-  "probabilities": {
-    "glioma": 0.9412,
-    "meningioma": 0.0315,
-    "notumor": 0.0073,
-    "pituitary": 0.0200
-  },
-  "confidence_threshold": 0.85,
-  "is_pathology": true,
-  "warning": null,
-  "error": null
-}
-```
+The returned result contains `prediction`, `confidence`, and probabilities for all four classes. It contains no clinical or diagnostic interpretation.
 
----
-
-### 4. Command Line (CLI) Usage
-
-Test scans directly from terminal:
+## Testing
 
 ```bash
-python src/inference/mri_predictor.py --image "path/to/scan.jpg" --threshold 0.85
+python -m pytest
 ```
 
----
+The test suite covers RGB, grayscale, RGBA, and palette image conversion; padding and normalization; corrupt-image errors; predictor errors; and probability-sum validation. Run it locally to verify your environment.
 
-### 5. Running the Test Suite
+## Data and model files
 
-Run the full automated test suite:
+- Raw medical images are not included and are ignored by Git.
+- `.keras`, `.h5`, `.weights.h5`, `.pt`, `.pth`, and `.onnx` model binaries are ignored by Git.
+- JSON metadata files remain versioned for reproducibility.
 
-```bash
-python -m pytest tests/ -v
-```
-
-All 16 unit tests validate input decoding (RGB, Grayscale, RGBA, Bytes, NumPy), aspect-ratio padding, Xception normalization, mock predictions, thresholding logic, and error resilience.
-
----
-
-## 🔬 Model Architecture & Training Methodology
-
-1. **Backbone**: Xception pretrained on ImageNet ($299 \times 299 \times 3$ input).
-2. **Selective Fine-Tuning**:
-   - Exit Flow **Block 14** (layers 126–131, 2,048 feature channels) selectively unfrozen.
-   - Entry Flow and Middle Flow (Blocks 1–12) strictly frozen.
-   - All `BatchNormalization` layers kept frozen in inference mode to preserve moving statistics.
-   - Trainable parameters: **`4,749,828`** (~22.8% of total model capacity).
-3. **Optimization**:
-   - Learning Rate: $\eta = 10^{-5}$ (`1e-5`) with Adam optimizer.
-   - Objective: Sparse Categorical Crossentropy.
-   - Validation Accuracy jumped from **92.14%** (Phase 3 baseline) to **95.80%** (Phase 4).
-
----
-
-## 🛡️ Clinical AI Safety & Ethical Guardrails
-
-- **Confidence Thresholding**: Predictions with confidence $< 0.85$ are flagged with `low_confidence: True` and trigger an automated warning for secondary specialist review.
-- **Triage Flagging**: Distinguishes between healthy scans (`is_pathology: False`) and suspected lesions (`is_pathology: True`).
-- **Academic Disclaimer**:
-  > **Important Medical Notice**: This software is developed strictly for academic and educational evaluation as part of a computer science graduation thesis. It does not provide medical diagnosis, clinical treatment plans, or autonomous healthcare decisions. All clinical findings must be verified by a board-certified radiologist.
-
----
-
-## 👥 Authors & Acknowledgments
-
-- **Developer**: Computer Science Graduation Project Team (ClinIQ)
-- **Modality**: Brain Tumor MRI Dataset (7,200 balanced multi-source scans)
-- **Supervision**: Department of Computer Science & AI Engineering
+Do not commit raw datasets, extracted images, archives, secrets, or large model binaries.

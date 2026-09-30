@@ -43,6 +43,6 @@ Macro Average F1             | 0.92                  | 0.9580                   
 - Selective unfreezing of Exit Flow Block 14 with lr=1e-05 provided controlled adaptation to MRI contrast.
 - Freeze protection on BatchNormalization prevented moving statistic degradation.
 - Original 1,600 Testing images were strictly isolated; no test-set leakage occurred.
-- Full validation metrics and confusion matrix exported to /kaggle/working/metrics/ and /kaggle/working/figures/.
+- Full validation metrics and confusion matrix exported to results/metrics/ and results/figures/.
 
-[+] Saved comparative report to: /kaggle/working/metrics/mri_phase4_report.txt
+[+] Saved comparative report to: results/metrics/mri_phase4_report.txt

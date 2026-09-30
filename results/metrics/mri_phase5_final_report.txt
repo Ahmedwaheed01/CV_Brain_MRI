@@ -42,7 +42,7 @@ Weighted Avg | 0.9348    | 0.9281  | 0.9263   | 1600
 --------------------------------------------
 - Fine-tuned Xception achieved an unbiased test accuracy of 92.81% on the held-out test cohort.
 - The model exhibits high sensitivity (98.00%) for identifying pathological brain scans.
-- All evaluation figures and CSV tables have been archived in /kaggle/working/figures/ and /kaggle/working/metrics/.
+- All evaluation figures and CSV tables have been archived in results/figures/ and results/metrics/.
 - The MRI Computer Vision model is officially validated and ready for Phase 6 artifact packaging and Phase 7 inference pipeline construction.
 
-[+] Saved final evaluation report to: /kaggle/working/metrics/mri_phase5_final_report.txt
+[+] Saved final evaluation report to: results/metrics/mri_phase5_final_report.txt

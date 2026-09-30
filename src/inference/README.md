@@ -1,114 +1,44 @@
-# ClinIQ — Brain MRI Inference Pipeline (Phase 6 & 7)
+# MRI inference module
 
-Production-grade standalone computer vision inference pipeline for multi-class Brain MRI tumor classification.
+`mri_predictor.py` is the reusable interface for the trained Brain MRI image-classification model.
 
----
-
-## 1. Supported Modality & Classes
-
-- **Modality**: Brain Magnetic Resonance Imaging (T1/T2-weighted axial/coronal/sagittal slices)
-- **Architecture**: Xception (Selective Fine-Tuning on Exit Flow Block 14)
-- **Input Resolution**: `299x299x3` (aspect-ratio preserved with uniform black borders)
-- **Classes**:
-  - `0`: **glioma**
-  - `1`: **meningioma**
-  - `2`: **notumor** (Healthy scan)
-  - `3`: **pituitary**
-
----
-
-## 2. Directory Structure
+It uses the shared preprocessing module rather than duplicating image handling:
 
 ```text
-CV feature/
-├── models/
-│   ├── class_names.json                     # Class index to label mapping
-│   ├── preprocess_config.json               # Preprocessing parameters (299x299, Lanczos, padding)
-│   ├── mri_model_metadata.json              # Model version, test metrics, and thresholds
-│   └── mri_xception_selective_finetuning_best.keras # Checkpoint downloaded from Kaggle
-├── src/
-│   ├── preprocessing/
-│   │   ├── __init__.py
-│   │   └── mri_preprocessing.py             # Image decoding, aspect-ratio padding, [-1, 1] scaling
-│   └── inference/
-│       ├── __init__.py
-│       ├── __main__.py                      # CLI runner
-│       └── mri_predictor.py                 # MRIPredictor OOP class & predict_mri API
-└── tests/
-    └── test_mri_inference.py                # 16 unit and integration tests (100% passing)
+input image -> RGB conversion -> aspect-preserving resize + black padding
+-> Xception normalization -> model -> class probabilities
 ```
 
----
-
-## 3. Quick Start
-
-### A. Python API Usage
+## Use from Python
 
 ```python
-from pathlib import Path
-from src.inference.mri_predictor import predict_mri, MRIPredictor
+from src.inference.mri_predictor import predict_mri
 
-# Option 1: Convenience Function (uses cached singleton)
-image_path = "data/raw/mri/Testing/glioma/Te-gl_1.jpg"
-result = predict_mri(image_path)
-print(result)
-
-# Option 2: Object-Oriented Predictor
-predictor = MRIPredictor(
-    model_path="models/mri_xception_selective_finetuning_best.keras",
-    confidence_threshold=0.85
-)
-
-# Accepts file paths, raw bytes (from web uploads), or PIL Images
-prediction = predictor.predict(image_path)
+result = predict_mri("path/to/image.jpg")
 ```
 
-### B. Standard Output Schema
+Successful results contain only classification information:
 
 ```json
 {
   "success": true,
   "prediction": "glioma",
   "class_index": 0,
-  "confidence": 0.9412,
-  "low_confidence": false,
+  "confidence": 0.94,
   "probabilities": {
-    "glioma": 0.9412,
-    "meningioma": 0.0315,
-    "notumor": 0.0073,
-    "pituitary": 0.0200
+    "glioma": 0.94,
+    "meningioma": 0.03,
+    "notumor": 0.01,
+    "pituitary": 0.02
   },
-  "confidence_threshold": 0.85,
-  "is_pathology": true,
-  "warning": null,
   "error": null
 }
 ```
 
-If the highest confidence is below `0.85`:
-```json
-{
-  "low_confidence": true,
-  "warning": "Confidence score (74.20%) is below the clinical verification threshold (85.00%). Manual specialist review is recommended."
-}
-```
+`confidence` is the selected model softmax output; it is not a clinical probability or diagnosis.
 
-### C. Command Line (CLI) Usage
+## Model weights
 
-```bash
-# Direct script
-python src/inference/mri_predictor.py --image "data/raw/mri/Testing/glioma/Te-gl_1.jpg"
+Set `CLINIQ_MRI_MODEL_PATH` to a local `.keras`/`.h5` weights file, or place the expected checkpoint in `models/`. Large model binaries are intentionally ignored by Git.
 
-# Or as a module
-python -m src.inference --image "path/to/scan.jpg" --threshold 0.85
-```
-
----
-
-## 4. Running Tests
-
-Run the full pytest suite from the project root:
-
-```bash
-python -m pytest "CV feature/tests/test_mri_inference.py" -v
-```
+If weights or an image are unavailable, the module returns `success: false` and a readable `error` message.
