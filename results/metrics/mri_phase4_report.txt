@@ -1,0 +1,48 @@
+MRI PHASE 4 — FINE-TUNING & MODEL COMPARISON REPORT
+======================================================
+
+1. EXPERIMENT SUMMARY
+---------------------
+Experiment A (Control): Frozen Xception Baseline (ImageNet)
+Experiment B (Treatment): Selective Fine-Tuning (Block 14 Unfrozen, BN Frozen)
+
+2. ARCHITECTURAL COMPARISON
+---------------------------
+Metric                       | Experiment A (Frozen) | Experiment B (Fine-Tuned)
+-----------------------------|-----------------------|--------------------------
+Total Parameters             | 20,869,676            | 20,869,676
+Trainable Parameters         | 8,196 (0.04%)         | 4,749,828 (22.76%)
+Unfrozen Backbone Layers     | None                  | Exit Flow Block 14 (SeparableConvs)
+BatchNormalization State     | Frozen                | Frozen
+Learning Rate                | 1e-3                  | 1e-05
+Optimizer                    | Adam                  | Adam
+Batch Size                   | 16                   | 16
+
+3. VALIDATION PERFORMANCE COMPARISON
+------------------------------------
+Metric                       | Experiment A (Frozen) | Experiment B (Fine-Tuned) | Delta
+-----------------------------|-----------------------|--------------------------|-------
+Validation Loss              | 0.2283               | 0.1098                   | -0.1185
+Validation Accuracy          | 92.14%              | 95.80%                  | +3.66%
+Best Epoch                   | 19                    | 18
+Testing Images Used          | 0 (Untouched)         | 0 (Untouched)            | 0
+
+4. PER-CLASS F1-SCORE COMPARISON
+--------------------------------
+Class                        | Experiment A F1       | Experiment B F1          | Delta
+-----------------------------|-----------------------|--------------------------|-------
+glioma                       | 0.92                  | 0.9587                   | +0.0387
+meningioma                   | 0.85                  | 0.9264                   | +0.0764
+notumor                      | 0.97                  | 0.9804                   | +0.0104
+pituitary                    | 0.93                  | 0.9664                   | +0.0364
+-----------------------------|-----------------------|--------------------------|-------
+Macro Average F1             | 0.92                  | 0.9580                   | +0.0380
+
+5. KEY SCIENTIFIC FINDINGS
+--------------------------
+- Selective unfreezing of Exit Flow Block 14 with lr=1e-05 provided controlled adaptation to MRI contrast.
+- Freeze protection on BatchNormalization prevented moving statistic degradation.
+- Original 1,600 Testing images were strictly isolated; no test-set leakage occurred.
+- Full validation metrics and confusion matrix exported to /kaggle/working/metrics/ and /kaggle/working/figures/.
+
+[+] Saved comparative report to: /kaggle/working/metrics/mri_phase4_report.txt

@@ -1,0 +1,57 @@
+MRI DATASET AUDIT
+=================
+
+Dataset path: C:\Users\LOQ\Documents\STUDYING\4th\Graduation project\graduation-cv\data\raw\mri
+Training images: 5600
+Testing images: 1600
+Total images: 7200
+
+Classes:
+- glioma: 1800
+- meningioma: 1800
+- notumor: 1800
+- pituitary: 1800
+
+Corrupted images: 0
+
+Image formats: {'.jpg': 7200}
+
+Image modes: {'RGB': 4129, 'L': 3067, 'RGBA': 3, 'P': 1}
+
+Dimension summary:
+- Width range  : 150 - 1375 (median: 512)
+- Height range : 167 - 1446 (median: 512)
+- Square images: 5667 (78.71%)
+- Non-square   : 1533 (21.29%)
+
+Exact duplicates:
+- within training: 171
+- within testing: 16
+- train/test: 0
+- label conflicts: 0
+
+Perceptual similarity findings:
+- Test images with Hamming distance <= 2 to train: 771
+- Test images with Hamming distance <= 6 to train: 1327
+
+Metadata:
+- Unavailable
+
+Patient-level leakage:
+- Cannot be ruled out because patient identifiers are unavailable.
+
+Class imbalance:
+- Balanced
+
+Overall dataset concerns:
+- 771 test images have Hamming distance <= 2 to a training image (consistent with near-duplicate / slice leakage).
+- Patient identifiers are unavailable; patient-level slice leakage cannot be ruled out.
+- 1533 non-square images present (21.3%).
+
+Verdict:
+- PROCEED (No exact cross-split byte duplicates detected)
+
+Recommendation for Phase 2:
+1. Maintain Testing folder as an untouched final test set.
+2. Note the absence of patient IDs in project documentation as an acknowledged limitation.
+3. Test and justify margin cropping vs. direct resizing in Phase 2.

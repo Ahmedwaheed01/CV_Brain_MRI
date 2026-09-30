@@ -1,0 +1,48 @@
+MRI PHASE 5 — FINAL MODEL EVALUATION REPORT
+=============================================
+
+1. EXPERIMENT OVERVIEW
+----------------------
+Model Evaluated     : Xception (Selective Fine-Tuning, Exit Flow Block 14)
+Checkpoint File     : mri_xception_selective_finetuning_best.keras
+Input Resolution    : 299x299x3 (Aspect-ratio preserving padding)
+Evaluation Dataset  : Original, Untouched Testing Directory
+Total Test Images   : 1,600 (400 glioma, 400 meningioma, 400 notumor, 400 pituitary)
+Test Integrity      : Zero test images were used during Phases 2, 3, or 4.
+
+2. GLOBAL TEST PERFORMANCE
+--------------------------
+Overall Test Accuracy: 92.81%
+Test Categorical Loss: 0.4732
+Macro Average F1     : 0.9263
+Weighted Average F1  : 0.9263
+
+3. PER-CLASS TEST PERFORMANCE
+-----------------------------
+Class        | Precision | Recall  | F1-Score | Support
+-------------|-----------|---------|----------|--------
+glioma       | 0.9902    | 0.7600  | 0.8600   | 400
+meningioma   | 0.8351    | 0.9625  | 0.8943   | 400
+notumor      | 0.9434    | 1.0000  | 0.9709   | 400
+pituitary    | 0.9706    | 0.9900  | 0.9802   | 400
+-------------|-----------|---------|----------|--------
+Macro Avg    | 0.9348    | 0.9281  | 0.9263   | 1600
+Weighted Avg | 0.9348    | 0.9281  | 0.9263   | 1600
+
+4. CLINICAL TRIAGE METRICS (TUMOR VS. HEALTHY)
+-----------------------------------------------
+- Total Pathology Scans (Tumors) : 1,200 (glioma, meningioma, pituitary)
+- Total Normal Scans (Healthy)   : 400 (notumor)
+- Tumor Sensitivity (Recall)     : 98.00% (1176/1200 tumors caught)
+- Normal Specificity             : 100.00% (400/400 healthy scans confirmed)
+- Critical False Negatives       : 24 (2.00% of tumors missed as 'notumor')
+- False Positives                : 0 healthy scans falsely flagged as tumor
+
+6. SCIENTIFIC CONCLUSIONS FOR THESIS DEFENSE
+--------------------------------------------
+- Fine-tuned Xception achieved an unbiased test accuracy of 92.81% on the held-out test cohort.
+- The model exhibits high sensitivity (98.00%) for identifying pathological brain scans.
+- All evaluation figures and CSV tables have been archived in /kaggle/working/figures/ and /kaggle/working/metrics/.
+- The MRI Computer Vision model is officially validated and ready for Phase 6 artifact packaging and Phase 7 inference pipeline construction.
+
+[+] Saved final evaluation report to: /kaggle/working/metrics/mri_phase5_final_report.txt

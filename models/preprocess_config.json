@@ -1,0 +1,12 @@
+{
+  "modality": "Brain MRI",
+  "target_size": [299, 299],
+  "color_mode": "RGB",
+  "padding_strategy": "aspect_ratio_preserving_pad",
+  "padding_color": [0, 0, 0],
+  "resampling_filter": "LANCZOS",
+  "normalization_method": "xception",
+  "normalization_formula": "(pixel / 127.5) - 1.0",
+  "pixel_range": [-1.0, 1.0],
+  "batch_input_shape": [null, 299, 299, 3]
+}

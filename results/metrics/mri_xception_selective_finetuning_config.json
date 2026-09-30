@@ -1,0 +1,28 @@
+{
+  "experiment_name": "mri_xception_selective_finetuning",
+  "random_state": 42,
+  "architecture": "Xception",
+  "pretrained_weights": "ImageNet",
+  "fine_tuning_strategy": "Selective Exit Flow (Block 14 unfrozen, Blocks 1-12 frozen, BN frozen)",
+  "input_size": [
+    299,
+    299
+  ],
+  "batch_size": 16,
+  "max_epochs": 20,
+  "optimizer": "Adam",
+  "learning_rate": 1e-05,
+  "loss": "SparseCategoricalCrossentropy",
+  "classes": [
+    "glioma",
+    "meningioma",
+    "notumor",
+    "pituitary"
+  ],
+  "train_images": 4480,
+  "validation_images": 1120,
+  "test_images_used": 0,
+  "total_parameters": 20869676,
+  "trainable_parameters": 4749828,
+  "known_limitation": "The standard validation split contains known exact duplicate groups crossing train and validation; validation results may be optimistic."
+}

@@ -1,0 +1,49 @@
+MRI PHASE 3 — FROZEN XCEPTION BASELINE
+=====================================
+
+Experiment:
+Name: mri_xception_frozen_baseline
+Random seed: 42
+
+Data:
+Training images: 4480
+Validation images: 1120
+Testing images used: 0
+
+Split:
+Source: Phase 2 stratified split
+Training/validation overlap: 0 paths
+Important limitation:
+The standard split includes known exact duplicate groups across training
+and validation. Validation metrics may therefore be optimistic.
+
+Preprocessing:
+RGB conversion: Pillow image.convert("RGB")
+Resize: aspect-ratio-preserving resize with black padding
+Input size: (299, 299)
+Model preprocessing: Xception preprocess_input
+Training augmentation: none
+Validation preprocessing: deterministic
+
+Model:
+Architecture: Xception
+Weights: ImageNet
+Backbone frozen: YES
+Classification head: GlobalAveragePooling2D -> Dropout(0.20) -> Dense(4, softmax)
+
+Training:
+Optimizer: Adam
+Initial learning rate: 0.001
+Batch size: 16
+Maximum epochs: 20
+Best validation-loss epoch: 19
+
+Best observed validation metrics:
+Validation loss: 0.2283
+Validation accuracy: 0.9214
+
+Final test evaluation:
+NOT PERFORMED
+The original Testing directory remains reserved for Phase 5.
+
+Saved report: /kaggle/working/metrics/mri_phase3_report.txt

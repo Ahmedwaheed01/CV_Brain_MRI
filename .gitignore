@@ -1,0 +1,66 @@
+# ==============================================================================
+# ClinIQ Computer Vision - Git Ignore Rules
+# ==============================================================================
+
+# Data directories (ignore heavy raw image directories)
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+# Ignore large archives and compressed datasets (>100MB limit on GitHub)
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+*.rar
+archive.zip
+
+# Heavy deep learning checkpoints (>100MB limit on GitHub)
+# Distribute weights via GitHub Releases, Hugging Face Hub, or Google Drive
+models/*.keras
+models/*.h5
+models/*.weights.h5
+models/*.pt
+models/*.pth
+models/*.onnx
+models/*.bin
+
+# Preserve configuration and schema artifacts
+!models/*.json
+!models/.gitkeep
+
+# Preserve evaluation figures and metrics for repository documentation
+!results/figures/*.png
+!results/metrics/*.csv
+!results/metrics/*.txt
+!results/metrics/*.json
+
+# Python virtual environments & bytecode cache
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Streamlit runtime cache
+.streamlit/secrets.toml
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+
+# Environment secrets and credentials
+.env
+*.env
+
+# Operating System & IDE files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

@@ -1,0 +1,62 @@
+MRI PHASE 1.5 — NEAR-DUPLICATE VALIDATION
+===========================================
+
+dHash <= 0:
+- Total test images: 423 (out of 1600 test images, 26.4%)
+- Same label: 416 (98.3%)
+- Different label: 7 (1.7%)
+- Visually near-identical (SSIM >= 0.90): 305 (72.1%)
+- Plausible adjacent slice (SSIM 0.75-0.90): 49 (11.6%)
+- Coarse dHash collisions (SSIM < 0.75): 69 (16.3%)
+
+dHash <= 2:
+- Total test images: 771 (out of 1600 test images, 48.2%)
+- Mean SSIM: 0.783
+- Mean MAE: 0.045
+- Mean Pearson correlation: 0.881
+
+Among sampled/checked pairs:
+
+SHA-256 identical:
+- 0 pairs (no exact byte-level duplicates exist across the predefined split)
+
+Visually/pixel-wise near-identical (SSIM >= 0.90):
+- 346 pairs (44.9% of checked pairs)
+- Demonstrates extreme visual overlap, often sharing identical tumor geometries, ventricle contours, and skull margins.
+
+Potentially similar but not identical (SSIM 0.75 - 0.90):
+- 100 pairs (13.0% of checked pairs)
+- Displays morphology consistent with adjacent 2D cross-sectional slices from an MRI volume, showing continuous tumor progression or slight anatomical displacement.
+
+dHash collisions / false positives (SSIM < 0.75):
+- 325 pairs (42.2% of checked pairs)
+- Matches resulting from coarse 8x8 gradient similarities across large dark background areas rather than identical brain tissue.
+
+Same-label matches:
+- 697 pairs (90.4%)
+
+Different-label matches:
+- 74 pairs (9.6%)
+- Demonstrates that dHash collisions on low-frequency background can occasionally match scans of different diagnostic classes.
+
+Main observations:
+1. Exact byte duplicates (SHA-256) are completely absent across the pre-made Training and Testing splits.
+2. However, perceptual similarity is substantial: 48.2% of test images (771/1600) have a nearest training image within dHash <= 2.
+3. SSIM analysis confirms that a significant portion (346 pairs with SSIM >= 0.90 and 100 pairs with SSIM 0.75-0.90) exhibit high structural agreement, consistent with adjacent slices from the same MRI scan series.
+4. Approximately 325 pairs (42.2%) are dHash collisions where the coarse 64-bit gradient matched dark peripheral backgrounds rather than matching tumor pathology.
+5. All original files were renamed to standardized prefixes ('Tr-...' and 'Te-...'), completely obscuring original patient and acquisition identifiers.
+
+What the evidence supports:
+- High structural and perceptual similarity exists between a substantial portion of the predefined Testing set and the Training set.
+- Many high-SSIM pairs display anatomy and tumor margins consistent with adjacent slices from the same imaging sequence.
+- The predefined split does not represent a completely independent external distribution, which contributes to the elevated test accuracies reported in literature.
+
+What the evidence does NOT prove:
+- The audit does NOT prove identical patient origin for any specific pair, as patient identifiers are completely unavailable.
+- Low dHash distance alone does NOT establish identical image provenance (evidenced by the 74 cross-class matches).
+
+Patient-level leakage:
+CANNOT BE DETERMINED (patient identifiers are unavailable)
+
+Recommended wording for thesis:
+"Perceptual hash (dHash) and structural similarity (SSIM) audits reveal substantial anatomical and visual overlap between the predefined Training and Testing sets (771 test images exhibited dHash distance <= 2 to training images, with 346 pairs demonstrating SSIM >= 0.90). While the lack of patient identifiers precludes definitive confirmation of patient-level slice leakage, this pronounced inter-split visual correlation indicates that evaluation on the predefined test set may yield optimistic performance estimates due to near-duplicate or adjacent-slice representation."

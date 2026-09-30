@@ -1,0 +1,43 @@
+MRI PHASE 2 — PREPROCESSING & SPLIT
+====================================
+
+Dataset:
+Training images: 5600
+Testing images: 1600
+
+Train/Validation split:
+Train: 4480
+Validation: 1120
+Random seed: 42
+Stratified: YES
+
+Class distribution:
+split       train  validation  total
+class                               
+glioma       1120         280   1400
+meningioma   1120         280   1400
+notumor      1120         280   1400
+pituitary    1120         280   1400
+
+Validation checks:
+Train ↔ Validation path overlap: 0
+Same-seed split reproducible: True
+Known exact-duplicate SHA-256 groups crossing Train/Validation: 56
+Files in those groups: 134
+Testing modified during notebook execution: NO
+
+Image preprocessing:
+RGB conversion: YES (Pillow convert('RGB') for every loaded image)
+Target size: (224, 224) (configurable; not an architecture decision)
+Strategies inspected: direct resize; aspect-ratio-preserving resize + black padding; exploratory margin crop + aspect-preserving resize + padding.
+
+Preprocessing comparison:
+The comparison is visual and descriptive only; no model was trained and no test image was used. Direct resize can geometrically distort non-square images. Padding preserves geometry but can retain class-correlated border/background characteristics. The exploratory crop reduces some borders but changes retained context by image/class, so it is not selected automatically.
+
+Final preprocessing recommendation:
+Keep direct resize and aspect-ratio-preserving padding as candidate deterministic pipelines for Phase 3/4 validation experiments. Do not adopt margin cropping as the default until a validation-only model comparison shows that it helps without creating unacceptable shortcut risk.
+
+Known limitations:
+The original predefined Testing split has substantial perceptual/structural similarity to Training, while patient-level leakage cannot be confirmed because identifiers are unavailable. The new random Train/Validation split may also place known exact duplicates across subsets; these are reported above and were not automatically removed.
+
+Ready for Phase 3: YES — after review of the figures and split policy.

@@ -1,0 +1,28 @@
+{
+  "experiment_name": "mri_xception_frozen_baseline",
+  "random_state": 42,
+  "architecture": "Xception",
+  "pretrained_weights": "ImageNet",
+  "backbone_frozen": true,
+  "input_size": [
+    299,
+    299
+  ],
+  "preprocessing": "Pillow convert('RGB') -> aspect-ratio-preserving resize -> black padding -> Xception preprocess_input",
+  "train_augmentation": "None",
+  "batch_size": 16,
+  "max_epochs": 20,
+  "optimizer": "Adam",
+  "learning_rate": 0.001,
+  "loss": "SparseCategoricalCrossentropy",
+  "classes": [
+    "glioma",
+    "meningioma",
+    "notumor",
+    "pituitary"
+  ],
+  "train_images": 4480,
+  "validation_images": 1120,
+  "test_images_used": 0,
+  "known_limitation": "The standard validation split contains known exact duplicate groups crossing train and validation; validation results may be optimistic."
+}
