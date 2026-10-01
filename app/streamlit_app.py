@@ -13,8 +13,8 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.inference.mri_predictor import MRIPredictor, find_default_model_path
-from src.preprocessing.mri_preprocessing import load_image_to_pil
+from mri.config import find_model_path
+from mri.service import MRIPredictor, load_image_to_pil
 
 
 @st.cache_resource(show_spinner=False)
@@ -52,7 +52,7 @@ def main() -> None:
 
     # Keep preview/upload available even when a clone does not include model
     # binaries. Inference itself never falls back to invented demo predictions.
-    model_path = find_default_model_path()
+    model_path = find_model_path()
     if model_path is None:
         st.error(
             "Cannot analyze this image because MRI model weights are unavailable. "

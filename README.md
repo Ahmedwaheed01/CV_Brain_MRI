@@ -40,12 +40,39 @@ The original dataset’s train/test folders show substantial perceptual and stru
 
 ```text
 app/streamlit_app.py             Streamlit MRI demonstration
-src/preprocessing/               Reusable RGB/padding/Xception preprocessing
-src/inference/                   Reusable model-loading and prediction API
+mri/config.py                    Portable MRI module settings
+mri/service.py                   Reusable MRI model loading and prediction service
+mri/router.py                    FastAPI APIRouter for the shared AI service
+mri/schemas.py                   API request/response schemas
+mri/tests/                       MRI module API contract tests
+src/preprocessing/               Existing reusable RGB/padding/Xception preprocessing
+src/inference/                   Backward-compatible Python inference imports
 models/*.json                    Lightweight class, preprocessing, and model metadata
 tests/                           Preprocessing and inference tests
 results/                         Reproducible training/evaluation artifacts
 ```
+
+## Shared AI-service integration
+
+The MRI repository does **not** create its own FastAPI application. In the future
+shared `cliniq-ai-service/main.py`, include this module's router alongside Voice
+and other modules:
+
+```python
+from fastapi import FastAPI
+from mri.router import router as mri_router
+
+app = FastAPI()
+app.include_router(mri_router)
+```
+
+This exposes `POST /mri/predict` for a `file` upload (JPG, JPEG, or PNG) and
+`GET /mri/health` for model availability. The prediction response contains only
+the class, selected softmax model confidence, and all class scores.
+
+Set `CLINIQ_MRI_MODEL_PATH` to an absolute path to the ignored `.keras` or `.h5`
+weights when the shared service stores the checkpoint outside `models/`. See
+`.env.example`; do not commit the actual `.env` file.
 
 ## Run locally
 
@@ -77,7 +104,7 @@ The returned result contains `prediction`, `confidence`, and probabilities for a
 python -m pytest
 ```
 
-The test suite covers RGB, grayscale, RGBA, and palette image conversion; padding and normalization; corrupt-image errors; predictor errors; and probability-sum validation. Run it locally to verify your environment.
+The test suite covers RGB, grayscale, RGBA, and palette image conversion; padding and normalization; corrupt-image errors; predictor errors; probability-sum validation; and the MRI FastAPI upload contract using a mock model. Run it locally to verify your environment.
 
 ## Data and model files
 
